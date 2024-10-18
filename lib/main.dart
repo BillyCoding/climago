@@ -16,12 +16,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
         textTheme: GoogleFonts.interTextTheme(
           // Definindo Inter como a fonte padrão
           Theme.of(context).textTheme,
         ),
       ),
       home: Home(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
