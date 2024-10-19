@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
+import '../services/weather_service.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,32 +11,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String apiKey = 'e00fd1162c57450e8e6122323241810';
   Map<String, dynamic>? weatherData;
   String city = 'Barueri';
+
+  final WeatherService _weatherService = WeatherService();
   final TextEditingController _cityController = TextEditingController();
 
   Future<void> fetchWeather() async {
-    String url =
-        'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$city&lang=pt';
-
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        // Decodifica a resposta JSON
-        final data = json.decode(response.body);
-        setState(() {
-          weatherData = data;
-        });
-
-        print('🟩 GET WEATHER SUCCESS');
-      } else {
-        print('🟥 GET WEATHER ERROR: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('🟥 GET WEATHER ERROR:: $e');
-    }
+    final data = await _weatherService.fetchWeather(city);
+    setState(() {
+      weatherData = data;
+    });
   }
 
   Future<void> _showCityDialog() async {
