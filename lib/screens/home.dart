@@ -129,6 +129,7 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                           IconButton(
+                              color: Colors.orange,
                               onPressed: _showCityDialog,
                               icon: const Icon(Icons.search, size: 24))
                         ],
@@ -151,7 +152,7 @@ class _HomeState extends State<Home> {
                                 Text(
                                   '${weatherData!['current']['condition']['text']}',
                                   style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.black45),
                                 ),
@@ -183,7 +184,7 @@ class _HomeState extends State<Home> {
                                 color: Colors.black45,
                               ),
                               Text(
-                                '${weatherData!['current']['wind_kph'].toInt()} km/h',
+                                '${weatherData!['current']['wind_kph'].toInt()}km/h',
                                 style: TextStyle(
                                     fontSize: 14, color: Colors.grey[800]),
                               ),
@@ -227,6 +228,101 @@ class _HomeState extends State<Home> {
                                     fontSize: 12, color: Colors.grey[600]),
                               )
                             ])
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 20),
+                                decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(16)),
+                                width:
+                                    (MediaQuery.of(context).size.width - 64) *
+                                        0.5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Índice UV',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600]),
+                                    ),
+                                    Text(
+                                      '${weatherData!['current']['uv'].toInt()}',
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          color: Colors.grey[800]),
+                                    ),
+                                    Text(
+                                      weatherData!['current']['uv'].toInt() > 10
+                                          ? 'Extremo'
+                                          : weatherData!['current']['uv']
+                                                      .toInt() >
+                                                  8
+                                              ? 'Muito alto'
+                                              : weatherData!['current']['uv']
+                                                          .toInt() >
+                                                      6
+                                                  ? 'Alto'
+                                                  : weatherData!['current']
+                                                                  ['uv']
+                                                              .toInt() >
+                                                          3
+                                                      ? 'Moderado'
+                                                      : 'Baixo',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.grey[800]),
+                                    ),
+                                  ],
+                                )),
+                            Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 20),
+                                decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(16)),
+                                width:
+                                    (MediaQuery.of(context).size.width - 64) *
+                                        0.5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Visibilidade',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600]),
+                                    ),
+                                    Text(
+                                      '${weatherData!['current']['vis_km'].toInt()}km',
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          color: Colors.grey[800]),
+                                    ),
+                                    Text(
+                                      weatherData!['current']['vis_km']
+                                                  .toInt() >
+                                              12
+                                          ? 'Excelente'
+                                          : weatherData!['current']['vis_km']
+                                                      .toInt() >
+                                                  9
+                                              ? 'Boa'
+                                              : 'Mediana',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.grey[800]),
+                                    ),
+                                  ],
+                                )),
                           ],
                         ),
                       )
