@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,8 +13,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String apiKey = 'e00fd1162c57450e8e6122323241810';
-  String city = 'Barueri'; // Cidade para buscar o clima
   Map<String, dynamic>? weatherData;
+  String city = 'Barueri';
+  final TextEditingController _cityController = TextEditingController();
 
   Future<void> fetchWeather() async {
     String url =
@@ -38,6 +40,39 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _showCityDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Nome da cidade'),
+          content: TextField(
+            controller: _cityController,
+            decoration: const InputDecoration(hintText: ''),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  city = _cityController.text;
+                });
+                Navigator.of(context).pop();
+                fetchWeather();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -54,55 +89,149 @@ class _HomeState extends State<Home> {
       ),
     );
 
+    String formattedDate = weatherData == null
+        ? '-'
+        : DateFormat('dd MMMM, EEEE', 'pt_BR')
+            .format(DateTime.parse(weatherData!['location']['localtime']));
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-              color: Colors.white,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          child: weatherData == null
+              ? const CircularProgressIndicator() // Mostra indicador de carregamento enquanto espera a API
+              : Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.location_pin,
-                        color: Colors.orange,
-                        size: 32,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap:
+                                    _showCityDialog, // Abre o diálogo ao clicar no nome da cidade
+                                child: Text(
+                                  '${weatherData!['location']['name']}',
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Text(
+                                formattedDate,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                              onPressed: _showCityDialog,
+                              icon: const Icon(Icons.search, size: 24))
+                        ],
                       ),
-                      Text(
-                        '${weatherData!['location']['name']}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  weatherData == null
-                      ? const CircularProgressIndicator() // Mostra indicador de carregamento enquanto espera a API
-                      : Column(
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Image.network(
-                                  'https:${weatherData!['current']['condition']['icon']}', // URL do ícone
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
+                                Text(
+                                  '${weatherData!['current']['temp_c'].toInt()}°',
+                                  style: const TextStyle(
+                                      fontSize: 56,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
                                 ),
                                 Text(
-                                  '${weatherData!['current']['temp_c']} °C',
+                                  '${weatherData!['current']['condition']['text']}',
                                   style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black54),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black45),
                                 ),
                               ],
-                            )
+                            ),
+                            Image.network(
+                              'https:${weatherData!['current']['condition']['icon']}', // URL do ícone
+                              width: 96,
+                              height: 96,
+                              fit: BoxFit.cover,
+                            ),
                           ],
                         ),
-                ],
-              )),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100], // Cor de fundo
+                          borderRadius: BorderRadius.circular(
+                              16), // Define o raio da borda
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(children: [
+                              const Icon(
+                                Icons.air,
+                                size: 32,
+                                color: Colors.black45,
+                              ),
+                              Text(
+                                '${weatherData!['current']['wind_kph'].toInt()} km/h',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey[800]),
+                              ),
+                              Text(
+                                'Vento',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[600]),
+                              )
+                            ]),
+                            Column(children: [
+                              const Icon(
+                                Icons.water_drop_outlined,
+                                size: 32,
+                                color: Colors.black45,
+                              ),
+                              Text(
+                                '${weatherData!['current']['humidity'].toInt()}%',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey[800]),
+                              ),
+                              Text(
+                                'Umidade',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[600]),
+                              )
+                            ]),
+                            Column(children: [
+                              const Icon(
+                                Icons.cloudy_snowing,
+                                size: 32,
+                                color: Colors.black45,
+                              ),
+                              Text(
+                                '${weatherData!['current']['cloud'].toInt()}%',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey[800]),
+                              ),
+                              Text(
+                                'Precipitação',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[600]),
+                              )
+                            ])
+                          ],
+                        ),
+                      )
+                    ],
+                  )),
         ),
       ),
     );

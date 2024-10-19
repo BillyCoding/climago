@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/home.dart'; // Importando a página inicial
+import 'screens/home.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
+
+  await initializeDateFormatting('pt_BR', null);
 }
 
 class MyApp extends StatelessWidget {
